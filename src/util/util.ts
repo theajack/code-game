@@ -1,11 +1,14 @@
-import {Json} from '../types';
+import {ICreareStateReturn, Json} from '../types';
 
 
 export function creatEventReady () {
-    let bridgeQueue = [];
-    let lastArgs = null;
+    let bridgeQueue: Array<{
+        fn(...args: any[]): void;
+        args: any[]
+    }> = [];
+    let lastArgs: any[]|null = null;
 
-    function onEventReady (fn: Function, ...args: any[]) {
+    function onEventReady (fn:(...args: any[])=> void, ...args: any[]) {
         if (!bridgeQueue.find(item => item.fn === fn)) {
             bridgeQueue.push({fn, args});
         }
@@ -32,9 +35,8 @@ export function creatEventReady () {
 }
 
 // 简易的状态管理
-export function createState (state: Json<any>) {
-    if (typeof state !== 'object') return;
-    let calls = {};
+export function createState (state: Json<any>): ICreareStateReturn {
+    let calls: Json<any> = {};
     for (let k in state) {
         calls[k] = creatEventReady();
     }
